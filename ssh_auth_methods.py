@@ -63,7 +63,7 @@ def main():
         verbose = len(sys.argv) == 2
 
         # loop through newline-delimited addresses
-        for line in sys.stdin():
+        for line in sys.stdin:
             hostname = line.strip()
             try:
                 auth_methods = get_auth_methods(hostname, verbose=verbose)
