@@ -2,7 +2,7 @@ import subprocess, sys
 
 # Should verbose be moved to main()?
 
-def get_auth_methods(hostname, port=22, verbose=False):
+def get_auth_methods(hostname, port=22, timeout=5, verbose=False):
     try:
         success_output = subprocess.check_output([
             'ssh',
@@ -13,10 +13,11 @@ def get_auth_methods(hostname, port=22, verbose=False):
             # prevents warning associated with unrecognized host key
             '-o', 'LogLevel=ERROR',
             '-p', str(port),
-            # use root user to prevent leaking username
-            'root@' + hostname,
-            'exit'],    # the command to be executed upon success
+            'root@' + hostname,    # use root user to prevent leaking username
+            'exit'],    # the command to be executed upon successful auth
             stderr=subprocess.STDOUT)
+        sleep(timeout)
+        raise Exception('ssh request timed out (%d seconds)' % timeout)
         # If we make it here, the server allowed us shell access without
         # authentication. Thankfully, the 'exit' command should have
         # left immediately.
