@@ -1,4 +1,6 @@
-import subprocess, sys, fileinput, argparse
+import subprocess, sys
+
+# Should verbose be moved to main()?
 
 def get_auth_methods(hostname, port=22, verbose=False):
     try:
@@ -60,10 +62,16 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
-        for line in fileinput.input():
+        # loop through newline-delimited addresses
+        for line in sys.stdin():
             hostname = line.strip()
-            # space-delimited lines
-            print(hostname, *get_auth_methods(hostname, verbose=verbose))
+            try:
+                auth_methods = get_auth_methods(hostname, verbose=verbose)
+            except:
+                # could probably use a verbose print option there
+                auth_methods = []
+
+            print('\t'.join([hostname] + auth_methods)
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
