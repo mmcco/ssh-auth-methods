@@ -9,7 +9,7 @@ def get_auth_methods(hostname, port=22, verbose=False):
             # the point - prevents attempted authentication
             '-o', 'PreferredAuthentications=none',
             # prevents warning associated with unrecognized host key
-            '-o', 'LogLevel=ERROR'
+            '-o', 'LogLevel=ERROR',
             '-p', str(port),
             # use root user to prevent leaking username
             'root@' + hostname,
