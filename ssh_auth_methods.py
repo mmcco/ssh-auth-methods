@@ -7,23 +7,7 @@ def get_auth_methods(hostname, port=22, verbose=False):
             '-o', 'StrictHostKeyChecking=no',
             '-o', 'PreferredAuthentications=none',
             '-p', str(port),
-            hostname,
-            'exit'],    # the command to be executed upon success
-            stderr=subprocess.STDOUT)
-        # If we make it here, the server allowed us shell access without
-        # authentication. Thankfully, the 'exit' command should have
-        # left immediately.
-mike@semper:~$ cat ssh_auth_methods.py 
-import subprocess, sys, fileinput
-
-def get_auth_methods(hostname, port=22, verbose=False):
-    try:
-        success_output = subprocess.check_output([
-            'ssh',
-            '-o', 'StrictHostKeyChecking=no',
-            '-o', 'PreferredAuthentications=none',
-            '-p', str(port),
-            hostname,
+            'root@' + hostname,
             'exit'],    # the command to be executed upon success
             stderr=subprocess.STDOUT)
         # If we make it here, the server allowed us shell access without
