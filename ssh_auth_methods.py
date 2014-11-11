@@ -71,7 +71,7 @@ def main():
                 # could probably use a verbose print option there
                 auth_methods = []
 
-            print('\t'.join([hostname] + auth_methods)
+            print('\t'.join([hostname] + auth_methods))
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
