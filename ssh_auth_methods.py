@@ -4,9 +4,14 @@ def get_auth_methods(hostname, port=22, verbose=False):
     try:
         success_output = subprocess.check_output([
             'ssh',
+            # prevents ominous error on changed host key
             '-o', 'StrictHostKeyChecking=no',
+            # the point - prevents attempted authentication
             '-o', 'PreferredAuthentications=none',
+            # prevents warning associated with unrecognized host key
+            '-o', 'LogLevel=ERROR'
             '-p', str(port),
+            # use root user to prevent leaking username
             'root@' + hostname,
             'exit'],    # the command to be executed upon success
             stderr=subprocess.STDOUT)
