@@ -60,7 +60,7 @@ def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     except:
         resp = None
 
-    response_queue.put(resp)
+    response_queue.put((hostname, resp))
     host_queue.task_done()
 
 
@@ -108,7 +108,10 @@ def main():
             print('\t'.join([hostname] + auth_methods))
         '''
 
-        _threaded_auth_methods(sys.stdin, verbose=verbose)
+        response_tups = _threaded_auth_methods(sys.stdin, verbose=verbose)
+
+        for hostname, methods in response_tups:
+            print('\t'.join([hostname] + methods)
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
