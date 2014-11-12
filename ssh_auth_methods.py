@@ -16,7 +16,7 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
                 # maximum time per connections
                 # NOTE: there can be multiple connections if a domain
                 # resolves to multiple IPs
-                '-o', 'ConnectTimeout=%d' % ceil(timeout)
+                '-o', 'ConnectTimeout=%d' % ceil(timeout),
                 '-p', str(port),
                 'root@' + hostname,    # use root user to prevent leaking username
                 'exit'],    # the command to be executed upon successful auth
