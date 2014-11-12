@@ -78,8 +78,8 @@ def _threaded_auth_methods(host_file, timeout=5, verbose=False):
         host_queue.put(line.strip())
         t = threading.Thread(
                 target=_ssh_worker,
-                args=[host_queue, response_queue, timeout, ssh_args],
-                daemon=True)
+                args=[host_queue, response_queue, timeout, ssh_args])
+        t.daemon = True
         t.start()
 
     host_queue.join()
