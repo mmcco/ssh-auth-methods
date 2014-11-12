@@ -67,3 +67,16 @@ a servers will be falsely reported as allowing unauthenticated login.
 
 ## Quirks
 
+The timeout mechanism used with Python 3.3+ is different from that used
+with older versions. The optional `timeout` argument was added to
+`subprocess.check_output()` in Python 3.3. With older versions of
+Python, we instead use the `ConnectTimeout` SSH option. This allows
+the specified timeout for every IP address associated with a domain
+name, so something like `google.com` will take significantly longer
+than the supplied timeout.
+
+I think the `subprocess.check_output()` timeout is probably preferable;
+if we haven't heard back from the server in five or so seconds, we
+probably aren't getting a response. However, there is no easy way
+to implement this in earlier versions of Python, aside perhaps from
+making the user install the `subprocess32` package.
