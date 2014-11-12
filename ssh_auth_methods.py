@@ -135,12 +135,18 @@ def main():
         verbose = len(sys.argv) == 2
 
         response_queue = Queue()
+
         master_thread = threading.Thread(
                 target=threaded_auth_methods,
                 args={'response_queue': response_queue, 'verbose': verbose})
+        master_thread.daemon = True
+        master_thread.start()
+
         print_thread = threading.Thread(
                 target=_print_response_thread,
                 args=(response_queue))
+        print_thread.daemon = True
+        print_thread.start()
 
         master_thread.join()
         response_queue.join()
