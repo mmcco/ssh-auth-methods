@@ -42,8 +42,8 @@ could not be contacted, or that there was an error parsing the response
 received.
 
 The auth method 'none' implies that the SSH server let us in without any
-authentication at all. I suspect this is possible, although I haven't encountered
-it. The SSH command ends in `'exit'` so that we'll disconnect immediately
+authentication at all. 
+Our SSH command ends in `'exit'` so that we'll disconnect immediately
 if granted access. In this case, we can't find what the other potential auth methods
 are (nor do they really matter), so 'none' will be the only one returned.
 Additionally, we assume that any non-error (i.e. not `255`) SSH exit status
@@ -72,6 +72,20 @@ As mentioned in the *Output* section, using an SSH client other than OpenSSH
 may cause unpredictable results because of exit statuses. Namely, if
 failed authentication is ever indicated by an exit status other than `255`,
 a servers will be falsely reported as allowing unauthenticated login.
+
+## Background
+
+[This StackOverflow post](http://stackoverflow.com/questions/3585586/how-can-i-programmatically-detect-ssh-authentication-types-available)
+tipped me off to the fact that the SSH Authentication Protocol
+([RFC 4252](https://www.ietf.org/rfc/rfc4252.txt)) suggests a slightly
+hacky way of finding which authentication methods an SSH server offers.
+SSH servers traditionally offer little information about their
+configuration for security reasons, so this isn't surprising.
+
+Specifically, if the client's `PreferredAuthentications` option is set to `none`
+and the server requires authentication, it is supposed to reject the request and supply a list of
+supported auth methods. In short, this script makes such a request and
+parses the supported auth methods out of the response.
 
 ## Quirks
 
