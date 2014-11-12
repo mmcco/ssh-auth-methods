@@ -137,7 +137,7 @@ def main():
         response_queue = Queue()
         master_thread = threading.Thread(
                 target=threaded_auth_methods,
-                args=(response_queue, verbose=verbose))
+                args={'response_queue': response_queue, 'verbose': verbose})
         print_thread = threading.Thread(
                 target=_print_response_thread,
                 args=(response_queue))
