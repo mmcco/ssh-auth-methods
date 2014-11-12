@@ -78,7 +78,10 @@ a servers will be falsely reported as allowing unauthenticated login.
 [This StackOverflow post](http://stackoverflow.com/questions/3585586/how-can-i-programmatically-detect-ssh-authentication-types-available)
 tipped me off to the fact that the SSH Authentication Protocol
 ([RFC 4252](https://www.ietf.org/rfc/rfc4252.txt)) suggests a slightly
-hacky way of finding which authentication methods an SSH server offers.
+hacky way of finding which authentication methods an SSH server offers:
+
+> Authentication methods are identified by their name, as defined in [SSH-ARCH]. The "none" method is reserved, and MUST NOT be listed as supported. However, it MAY be sent by the client. The server MUST always reject this request, unless the client is to be granted access without any authentication, in which case, the server MUST accept this request. The main purpose of sending this request is to get the list of supported methods from the server.
+
 SSH servers traditionally offer little information about their
 configuration for security reasons, so this isn't surprising.
 
