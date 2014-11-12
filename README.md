@@ -4,12 +4,9 @@ ssh-auth-methods
 A simple Python 3 script and package that returns a list of the
 authentication methods supported by an SSH server.
 
-Usable library functions are included, as well as a Unix-compliant
-threaded script.
-
 No non-standard Python packages are required.
 
-**WARNING** *The IP address that you run this script on can get blocked
+**WARNING:** *The IP address that you run this script on can get blocked
 or even blacklisted! Use with caution. (See the _Warnings_ section below
 for more info).*
 
@@ -41,6 +38,9 @@ supported by the corresponding SSH server.
 Nothing is printed after the address if the address
 could not be resolved, the request timed out,
 or that there was an error parsing the response received.
+
+The script is threaded, so outputs will be printing as they are received
+and processed.
 
 The auth method 'none' implies that the SSH server let us in without any
 authentication at all. 
@@ -115,7 +115,7 @@ to begin publicly auditing the network's security.
 More generally, it's valuable to know which authentication methods a
 server supports, as some are far weaker than others. Generally, you
 should only support public-key authentication unless you have a very
-good reason to be doing otherwise.
+good reason to do otherwise.
 
 This tool, like nmap et al., is useful for scanning your own servers.
 You may find that one of your machine's `/etc/ssh/sshd_config` options

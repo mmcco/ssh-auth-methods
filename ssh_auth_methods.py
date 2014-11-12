@@ -54,11 +54,6 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
             return ['none']
 
         elif result.startswith('ssh: Could not resolve hostname'):
-            if verbose:
-                print('hostname resolution failed - '
-                'maybe the server is down, '
-                'the SSH server is on another port, '
-                'or your IP is blacklisted?')
             raise Exception('resolution of hostname ' +  hostname + ' failed')
 
         elif result.endswith('Connection timed out'):
@@ -76,13 +71,15 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
 
 
 def _ssh_worker(host_queue, response_queue, ssh_args):
-    
     hostname = host_queue.get()
 
     try:
         resp = get_auth_methods(hostname, **ssh_args)
     except:
         resp = None
+        # print exception text to stderr if we're being verbose
+        if ssh_args['verbose']:
+            print(sys.exc_info[1], file=sys.stderr)
 
     response_queue.put((hostname, resp))
     host_queue.task_done()
