@@ -1,20 +1,37 @@
 import subprocess, sys, threading
 from queue import Queue
 
-def get_auth_methods(hostname, port=22, verbose=False):
+def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
     try:
-        success_output = subprocess.check_output([
-            'ssh',
-            # prevents ominous error on changed host key
-            '-o', 'StrictHostKeyChecking=no',
-            # the point - prevents attempted authentication
-            '-o', 'PreferredAuthentications=none',
-            # prevents warning associated with unrecognized host key
-            '-o', 'LogLevel=ERROR',
-            '-p', str(port),
-            'root@' + hostname,    # use root user to prevent leaking username
-            'exit'],    # the command to be executed upon successful auth
-            stderr=subprocess.STDOUT)
+        if sys.version_info.minor < 3:
+            success_output = subprocess.check_output([
+                'ssh',
+                # prevents ominous error on changed host key
+                '-o', 'StrictHostKeyChecking=no',
+                # the point - prevents attempted authentication
+                '-o', 'PreferredAuthentications=none',
+                # prevents warning associated with unrecognized host key
+                '-o', 'LogLevel=ERROR',
+                # maximum time per connections
+                # NOTE: there can be multiple connections if a domain
+                # resolves to multiple IPs
+                '-o', 'ConnectTimeout=%d' % int(timeout))
+                '-p', str(port),
+                'root@' + hostname,    # use root user to prevent leaking username
+                'exit'],    # the command to be executed upon successful auth
+                stderr=subprocess.STDOUT)
+        else:
+            success_output = subprocess.check_output([
+                'ssh',
+                '-o', 'StrictHostKeyChecking=no',
+                '-o', 'PreferredAuthentications=none',
+                '-o', 'LogLevel=ERROR',
+                '-p', str(port),
+                'root@' + hostname,
+                'exit'],
+                stderr=subprocess.STDOUT,
+                # only available in Python 3.3+ (reason for condition_
+                timeout=timeout)
         # If we make it here, the server allowed us shell access without
         # authentication. Thankfully, the 'exit' command should have
         # left immediately.
@@ -42,6 +59,9 @@ def get_auth_methods(hostname, port=22, verbose=False):
                 'or your IP is blacklisted?')
             raise Exception('resolution of hostname ' +  hostname + ' failed')
 
+        elif result.endswith('Connection timed out'):
+            raise Exception('connection to ' + hostname + ' timed out')
+
         elif result.startswith('Permission denied (') \
                 and result.endswith(').'):
             # assume the format specified in the above condition with
@@ -50,11 +70,13 @@ def get_auth_methods(hostname, port=22, verbose=False):
 
         else:
             raise Exception('unexpected SSH error response: ' + result)
+    # we leave subprocess.TimeoutExpired uncaught, so it will propagate
 
 
 def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     
     hostname = host_queue.get()
+
     try:
         resp = get_auth_methods(hostname, **ssh_args)
     except:
@@ -64,7 +86,7 @@ def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     host_queue.task_done()
 
 
-def _threaded_auth_methods(host_file, timeout=5, verbose=False):
+def _threaded_auth_methods(host_file, delay=0.1, timeout=5, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
@@ -78,8 +100,7 @@ def _threaded_auth_methods(host_file, timeout=5, verbose=False):
         host_queue.put(line.strip())
         t = threading.Thread(
                 target=_ssh_worker,
-                args=[host_queue, response_queue, timeout, ssh_args])
-        t.daemon = True
+                args=[host_queue, response_queue, timeout, ssh_args]
         t.start()
 
     host_queue.join()
@@ -88,6 +109,10 @@ def _threaded_auth_methods(host_file, timeout=5, verbose=False):
 
 
 def main():
+    if sys.version_info.major != 3:
+        print('this script only runs on Python 3, which should be '
+                'available on your platform',
+                file=sys.stderr)
     # the only two currently acceptable argument situations
     # a more complex argument system (using argparse, for example) may
     # be added later if needed.

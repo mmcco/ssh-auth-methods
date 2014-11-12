@@ -44,17 +44,21 @@ command.
 ### Function
 
 The sole function in this module is `get_auth_methods()`. It takes the
-hostname scanned, an optional port number (defaulting to `22`), and a
+hostname scanned, an optional port number (defaulting to `22`), a default
+SSH request timeout (defaulting to 5.0), and a
 boolean determining verbosity (defaulting to False).
 
 Support will soon be added for threaded calls on multiple addresses.
 
 ## Dependencies
 
-This currently only runs on Python 3. It's short and simple, so porting it should be simple.
-I may do so myself at some point if people use this.
+This currently only runs on Python 3. Because the code is relatively
+small and simple, porting should be pretty easy.
 
-As mentioned in the *Output* section, using a client other than OpenSSH
+As mentioned in the *Output* section, using an SSH client other than OpenSSH
 may cause unpredictable results because of exit statuses. Namely, if
 failed authentication is ever indicated by an exit status other than `255`,
 a servers will be falsely reported as allowing unauthenticated login.
+
+## Quirks
+
