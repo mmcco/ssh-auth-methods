@@ -53,20 +53,15 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
                 'Also, the command passed had a non-zero exit status.')
             return ['none']
 
-        elif result.startswith('ssh: Could not resolve hostname'):
-            raise Exception('resolution of hostname ' +  hostname + ' failed')
-
-        elif result.endswith('Connection timed out'):
-            raise Exception('connection to ' + hostname + ' timed out')
-
         elif result.startswith('Permission denied (') \
                 and result.endswith(').'):
             # assume the format specified in the above condition with
             # comma-delimited auth methods
             return result[19:-2].split(',')
 
+        # re-raise other exceptions, which are various connection errors
         else:
-            raise Exception('unexpected SSH error response: ' + result)
+            raise e
     # we leave subprocess.TimeoutExpired uncaught, so it will propagate
 
 
