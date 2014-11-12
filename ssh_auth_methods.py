@@ -116,7 +116,7 @@ def _print_response_thread(response_queue, outfile = sys.stdout):
         if methods is None:
             print(hostname, file=outfile)
         else:
-            print('\t'.join([hostname] + methods)
+            print('\t'.join([hostname] + methods),
                     file=outfile)
         response_queue.task_done()
 
