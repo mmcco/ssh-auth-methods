@@ -88,7 +88,7 @@ def _ssh_worker(host_queue, response_queue, ssh_args):
     host_queue.task_done()
 
 
-def _threaded_auth_methods(host_file, delay=0.1, timeout=5.0, verbose=False):
+def threaded_auth_methods(host_file, delay=0.1, timeout=5.0, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
@@ -125,20 +125,7 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
-        '''
-        # loop through newline-delimited hostnames
-        for line in sys.stdin:
-            hostname = line.strip()
-            try:
-                auth_methods = get_auth_methods(hostname, verbose=verbose)
-            except:
-                # could probably use a verbose print option there
-                auth_methods = []
-
-            print('\t'.join([hostname] + auth_methods))
-        '''
-
-        response_tups = _threaded_auth_methods(sys.stdin, verbose=verbose)
+        response_tups = threaded_auth_methods(sys.stdin, verbose=verbose)
 
         for hostname, methods in response_tups:
             if methods is None:

@@ -4,14 +4,19 @@ ssh-auth-methods
 A simple Python 3 script and package that returns a list of the
 authentication methods supported by an SSH server.
 
+Usable library functions are included, as well as a Unix-compliant
+threaded script.
+
+No non-standard Python packages are required.
+
 **WARNING** *This is in heavy development as of Nov. 11, 2014. Don't
 trust it yet!*
 
 ## Use
 
 The next two subsections assume that you're using this as
-a stand-alone shell script. The function can be imported to Python 3
-code. See the section *Function* for a discussion of this.
+a stand-alone shell script. The functions can be imported to Python 3
+code. See the section *Library* for a discussion of this.
 
 ### Input
 
@@ -46,14 +51,17 @@ means the login was successful. This is because 255 is OpenSSH's only
 error status, and all other statuses are those of the remotely executed
 command (see OpenSSH man pages).
 
-### Function
+### Library
 
-The sole function in this module is `get_auth_methods()`. It takes the
+The core function in this module is `get_auth_methods()`. It takes the
 hostname scanned, an optional port number (defaulting to `22`), a default
 SSH request timeout (defaulting to 5.0), and a
 boolean determining verbosity (defaulting to False).
 
-Support will soon be added for threaded calls on multiple addresses.
+`threaded_auth_methods()` takes a file containing newline-delimited
+hostnames and spawns a thread executing `get_auth_methods()` for each
+of them. I'll leave out specific argument descriptions, as the code
+should be self-documenting.
 
 ## Dependencies
 
