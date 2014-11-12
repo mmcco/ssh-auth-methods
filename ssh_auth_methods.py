@@ -110,7 +110,7 @@ def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.1, timeou
     host_queue.join()
 
 
-def _print_response_thread(response_queue, outfile = sys.stdout):
+def _print_response_thread(response_queue, outfile=sys.stdout):
     while True:
         hostname, methods = response_queue.get()
         if methods is None:
@@ -135,8 +135,12 @@ def main():
         verbose = len(sys.argv) == 2
 
         response_queue = Queue()
-        master_thread = threaded_auth_methods(response_queue, verbose=verbose)
-        print_thread = _print_response_thread(response_queue)
+        master_thread = threading.Thread(
+                target=threaded_auth_methods
+                args=(response_queue, verbose=verbose))
+        print_thread = threading.Thread(
+                target=_print_response_thread,
+                args=(response_queue))
 
         master_thread.join()
         response_queue.join()
