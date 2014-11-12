@@ -1,8 +1,7 @@
-import subprocess, sys
+import subprocess, sys, threading
+from queue import Queue
 
-# Should verbose be moved to main()?
-
-def get_auth_methods(hostname, port=22, timeout=5, verbose=False):
+def get_auth_methods(hostname, port=22, verbose=False):
     try:
         success_output = subprocess.check_output([
             'ssh',
@@ -16,8 +15,6 @@ def get_auth_methods(hostname, port=22, timeout=5, verbose=False):
             'root@' + hostname,    # use root user to prevent leaking username
             'exit'],    # the command to be executed upon successful auth
             stderr=subprocess.STDOUT)
-        sleep(timeout)
-        raise Exception('ssh request timed out (%d seconds)' % timeout)
         # If we make it here, the server allowed us shell access without
         # authentication. Thankfully, the 'exit' command should have
         # left immediately.
@@ -39,11 +36,11 @@ def get_auth_methods(hostname, port=22, timeout=5, verbose=False):
 
         elif result.startswith('ssh: Could not resolve hostname'):
             if verbose:
-                print('address resolution failed - '
+                print('hostname resolution failed - '
                 'maybe the server is down, '
                 'the SSH server is on another port, '
                 'or your IP is blacklisted?')
-            raise Exception('resolution of address ' +  hostname + ' failed')
+            raise Exception('resolution of hostname ' +  hostname + ' failed')
 
         elif result.startswith('Permission denied (') \
                 and result.endswith(').'):
@@ -55,6 +52,38 @@ def get_auth_methods(hostname, port=22, timeout=5, verbose=False):
             raise Exception('unexpected SSH error response: ' + result)
 
 
+def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
+    
+    hostname = host_queue.get()
+    try:
+        resp = get_auth_methods(hostname, **ssh_args)
+    except:
+        resp = None
+
+    response_queue.put(resp)
+    host_queue.task_done()
+
+
+def _threaded_auth_methods(hostnames, timeout=5, num_threads=20, verbose=False):
+    # All get_auth_methods() args aside from hostname are optional,
+    # and are the same across all calls.
+    # We therefore use a dict of args that is unpacked in calls.
+    ssh_args = {'verbose': verbose}
+    host_queue = Queue()
+
+    for _ in range(num_threads):
+        t = threading.Thread(
+                target=_ssh_worker,
+                args=[host_queue, Queue(), timeout, ssh_args]
+                daemon=True)
+        t.start()
+
+    for hostname in hostnames:
+        host_queue.put(hostname)
+
+    host_queue.join()
+
+
 def main():
     # the only two currently acceptable argument situations
     # a more complex argument system (using argparse, for example) may
@@ -63,7 +92,7 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
-        # loop through newline-delimited addresses
+        # loop through newline-delimited hostnames
         for line in sys.stdin:
             hostname = line.strip()
             try:
