@@ -9,7 +9,7 @@ trust it yet!*
 
 ## Use
 
-The next two subsections assume that you're using this script as
+The next two subsections assume that you're using this as
 a stand-alone shell script. The function can be imported to Python 3
 code. See the section *Function* for a discussion of this.
 

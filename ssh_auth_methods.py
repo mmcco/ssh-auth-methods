@@ -141,7 +141,10 @@ def main():
         response_tups = _threaded_auth_methods(sys.stdin, verbose=verbose)
 
         for hostname, methods in response_tups:
-            print('\t'.join([hostname] + methods))
+            if methods is None:
+                print(hostname)
+            else:
+                print('\t'.join([hostname] + methods))
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
