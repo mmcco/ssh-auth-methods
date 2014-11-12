@@ -135,7 +135,7 @@ def main():
         verbose = len(sys.argv) == 2
 
         response_queue = Queue()
-        master_thread = threaded_auth_methods(sys.stdin, response_queue, verbose=verbose)
+        master_thread = threaded_auth_methods(response_queue, verbose=verbose)
         print_thread = _print_response_thread(response_queue)
 
         master_thread.join()
