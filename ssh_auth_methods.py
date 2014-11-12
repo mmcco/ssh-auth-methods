@@ -74,11 +74,9 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
     # we leave subprocess.TimeoutExpired uncaught, so it will propagate
 
 
-def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
+def _ssh_worker(host_queue, response_queue, ssh_args):
     
     hostname = host_queue.get()
-    # TODO: add port
-    ssh_args = {'timeout': timeout, 'verbose': verbose}
 
     try:
         resp = get_auth_methods(hostname, **ssh_args)
@@ -89,11 +87,12 @@ def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     host_queue.task_done()
 
 
-def _threaded_auth_methods(host_file, delay=0.1, timeout=5, verbose=False):
+def _threaded_auth_methods(host_file, delay=0.1, timeout=5.0, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
-    ssh_args = {'verbose': verbose}
+    # TODO: add port
+    ssh_args = {'verbose': verbose, timeout=timeout}
     host_queue, response_queue = Queue(), Queue()
 
     num_hosts = 0
@@ -103,7 +102,7 @@ def _threaded_auth_methods(host_file, delay=0.1, timeout=5, verbose=False):
         host_queue.put(line.strip())
         t = threading.Thread(
                 target=_ssh_worker,
-                args=[host_queue, response_queue, timeout, ssh_args])
+                args=[host_queue, response_queue, ssh_args])
         t.start()
 
     host_queue.join()
