@@ -61,7 +61,7 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
 
         # re-raise other exceptions, which are various connection errors
         else:
-            raise e
+            raise Exception(result)
     # we leave subprocess.TimeoutExpired uncaught, so it will propagate
 
 
