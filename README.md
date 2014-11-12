@@ -37,9 +37,9 @@ The ouput is one address per line. Each line is tab-delimited, with
 the supplied address as its first field, followed by each authentication method
 supported by the corresponding SSH server.
 
-Nothing is printed after the address in the case that the address
-could not be contacted, or that there was an error parsing the response
-received.
+Nothing is printed after the address if the address
+could not be resolved, the request timed out,
+or that there was an error parsing the response received.
 
 The auth method 'none' implies that the SSH server let us in without any
 authentication at all. 
