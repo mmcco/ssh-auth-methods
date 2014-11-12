@@ -88,7 +88,7 @@ def _ssh_worker(host_queue, response_queue, ssh_args):
     host_queue.task_done()
 
 
-def threaded_auth_methods(host_file, delay=0.1, timeout=5.0, verbose=False):
+def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.1, timeout=5.0, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
@@ -109,7 +109,16 @@ def threaded_auth_methods(host_file, delay=0.1, timeout=5.0, verbose=False):
 
     host_queue.join()
 
-    return [response_queue.get() for _ in range(num_hosts)]
+
+def _print_response_thread(response_queue, outfile = sys.stdout):
+    while True:
+        hostname, methods = response_queue.get()
+        if methods is None:
+            print(hostname, file=outfile)
+        else:
+            print('\t'.join([hostname] + methods)
+                    file=outfile)
+        response_queue.task_done()
 
 
 def main():
@@ -125,13 +134,13 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
-        response_tups = threaded_auth_methods(sys.stdin, verbose=verbose)
+        response_queue = Queue()
+        master_thread = threaded_auth_methods(sys.stdin, response_queue, verbose=verbose)
+        print_thread = _print_response_thread(response_queue)
 
-        for hostname, methods in response_tups:
-            if methods is None:
-                print(hostname)
-            else:
-                print('\t'.join([hostname] + methods))
+        master_thread.join()
+        print_thread.join()
+
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
