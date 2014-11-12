@@ -84,7 +84,7 @@ def _threaded_auth_methods(host_file, timeout=5, verbose=False):
 
     host_queue.join()
 
-    return [response_queue.get() for _ in num_hosts]
+    return [response_queue.get() for _ in range(num_hosts)]
 
 
 def main():
