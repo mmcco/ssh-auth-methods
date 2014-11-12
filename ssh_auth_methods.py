@@ -79,7 +79,7 @@ def _ssh_worker(host_queue, response_queue, ssh_args):
         resp = None
         # print exception text to stderr if we're being verbose
         if ssh_args['verbose']:
-            print(sys.exc_info[1], file=sys.stderr)
+            print(sys.exc_info()[1], file=sys.stderr)
 
     response_queue.put((hostname, resp))
     host_queue.task_done()
