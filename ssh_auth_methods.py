@@ -144,7 +144,7 @@ def main():
 
         print_thread = threading.Thread(
                 target=_print_response_thread,
-                args=(response_queue))
+                args=(response_queue,))
         print_thread.daemon = True
         print_thread.start()
 
