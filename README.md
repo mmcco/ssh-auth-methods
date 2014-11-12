@@ -9,8 +9,9 @@ threaded script.
 
 No non-standard Python packages are required.
 
-**WARNING** *This is in heavy development as of Nov. 11, 2014. Don't
-trust it yet!*
+**WARNING** *The IP address that you run this script on can get blocked
+or even blacklisted! Use with caution. (See the _Warnings_ section below
+for more info).*
 
 ## Use
 
@@ -47,7 +48,7 @@ Our SSH command ends in `'exit'` so that we'll disconnect immediately
 if granted access. In this case, we can't find what the other potential auth methods
 are (nor do they really matter), so 'none' will be the only one returned.
 Additionally, we assume that any non-error (i.e. not `255`) SSH exit status
-means the login was successful. This is because 255 is OpenSSH's only
+means the login was successful. This is because `255` is OpenSSH's only
 error status, and all other statuses are those of the remotely executed
 command (see OpenSSH man pages).
 
@@ -62,6 +63,22 @@ boolean determining verbosity (defaulting to False).
 hostnames and spawns a thread executing `get_auth_methods()` for each
 of them. I'll leave out specific argument descriptions, as the code
 should be self-documenting.
+
+## Warning
+
+SSH protection software like [SSHGuard](http://www.sshguard.net/) and
+[fail2ban](http://www.fail2ban.org/wiki/index.php/Main_Page) will
+probably find your requests suspect even though they don't attempt to
+feign authentication. I know SSHGuard does, as some of my own servers
+started blocking my test server. This may even lead to the IP address
+used being added to a blacklist if this software reports offenders. So,
+exercise restraint, and consider using a [dirt-cheap VPS](http://lowendbox.com/).
+
+As with all security scanning software, there is potential to make
+people suspicious or angry if you don't give them prior warning. Despite
+this being a particularly harmless breed, I should probably clarify that
+I don't offer this script for nefarious or illegal use. For everything
+you need to know about liability, see the included license.
 
 ## Dependencies
 
@@ -89,6 +106,21 @@ Specifically, if the client's `PreferredAuthentications` option is set to `none`
 and the server requires authentication, it is supposed to reject the request and supply a list of
 supported auth methods. In short, this script makes such a request and
 parses the supported auth methods out of the response.
+
+## Why?
+
+The short answer is that I wanted to do a security scan of Tor relays
+to begin publicly auditing the network's security.
+
+More generally, it's valuable to know which authentication methods a
+server supports, as some are far weaker than others. Generally, you
+should only support public-key authentication unless you have a very
+good reason to be doing otherwise.
+
+This tool, like nmap et al., is useful for scanning your own servers.
+You may find that one of your machine's `/etc/ssh/sshd_config` options
+weren't what you thought, or even that you forgot to restart `sshd`
+after changing them. I did.
 
 ## Quirks
 
