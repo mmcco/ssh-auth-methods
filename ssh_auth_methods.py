@@ -64,24 +64,27 @@ def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     host_queue.task_done()
 
 
-def _threaded_auth_methods(hostnames, timeout=5, num_threads=20, verbose=False):
+def _threaded_auth_methods(host_file, timeout=5, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
     ssh_args = {'verbose': verbose}
-    host_queue = Queue()
+    host_queue, response_queue = Queue(), Queue()
 
-    for _ in range(num_threads):
+    num_hosts = 0
+
+    for line in host_file:
+        num_hosts += 1
+        host_queue.put(line.strip())
         t = threading.Thread(
                 target=_ssh_worker,
-                args=[host_queue, Queue(), timeout, ssh_args],
+                args=[host_queue, response_queue, timeout, ssh_args],
                 daemon=True)
         t.start()
 
-    for hostname in hostnames:
-        host_queue.put(hostname)
-
     host_queue.join()
+
+    return [response_queue.get() for _ in num_hosts]
 
 
 def main():
@@ -92,6 +95,7 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
+        '''
         # loop through newline-delimited hostnames
         for line in sys.stdin:
             hostname = line.strip()
@@ -102,6 +106,9 @@ def main():
                 auth_methods = []
 
             print('\t'.join([hostname] + auth_methods))
+        '''
+
+        _threaded_auth_methods(sys.stdin, verbose=verbose)
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
