@@ -78,7 +78,7 @@ def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     
     hostname = host_queue.get()
     # TODO: add port
-    ssh_args = {'timeout'=timeout, 'verbose'=verbose}
+    ssh_args = {'timeout': timeout, 'verbose': verbose}
 
     try:
         resp = get_auth_methods(hostname, **ssh_args)
@@ -116,6 +116,7 @@ def main():
         print('this script only runs on Python 3, which should be '
                 'available on your platform',
                 file=sys.stderr)
+        sys.exit(1)
     # the only two currently acceptable argument situations
     # a more complex argument system (using argparse, for example) may
     # be added later if needed.
@@ -146,6 +147,7 @@ def main():
                 file=sys.stdin)
         print('usage: python3 ssh_password.py [-v]',
                 file=sys.stdin)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
