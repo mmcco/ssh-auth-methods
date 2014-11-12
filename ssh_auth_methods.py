@@ -38,7 +38,8 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
         # authentication. Thankfully, the 'exit' command should have
         # left immediately.
         if verbose:
-            print('Eek! Server allowed unauthenticated login! Exiting.')
+            print('Eek! %s allowed unauthenticated login! Exiting.'
+                    % hostname)
         return ['none']
     # This is in fact the expected case, as we expect the SSH server to
     # reject the unauthenticated connection, and therefore expect exit code
@@ -49,8 +50,9 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
 
         if e.returncode != 255:
             if verbose:
-                print('Eek! Server allowed unauthenticated login! '
-                'Also, the command passed had a non-zero exit status.')
+                print('Eek! %s allowed unauthenticated login! '
+                'Also, the command passed had a non-zero exit status.'
+                        % hostname)
             return ['none']
 
         elif result.startswith('Permission denied (') \
