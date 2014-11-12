@@ -139,7 +139,7 @@ def main():
         print_thread = _print_response_thread(response_queue)
 
         master_thread.join()
-        print_thread.join()
+        response_queue.join()
 
 
     else:
