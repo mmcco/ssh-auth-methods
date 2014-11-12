@@ -94,7 +94,7 @@ def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.1, timeou
     # We therefore use a dict of args that is unpacked in calls.
     # TODO: add port
     ssh_args = {'verbose': verbose, 'timeout': timeout}
-    host_queue, response_queue = Queue(), Queue()
+    host_queue = Queue()
 
     num_hosts = 0
 
