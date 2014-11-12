@@ -77,6 +77,8 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
 def _ssh_worker(host_queue, response_queue, timeout, ssh_args):
     
     hostname = host_queue.get()
+    # TODO: add port
+    ssh_args = {'timeout'=timeout, 'verbose'=verbose}
 
     try:
         resp = get_auth_methods(hostname, **ssh_args)
@@ -101,7 +103,7 @@ def _threaded_auth_methods(host_file, delay=0.1, timeout=5, verbose=False):
         host_queue.put(line.strip())
         t = threading.Thread(
                 target=_ssh_worker,
-                args=[host_queue, response_queue, timeout, ssh_args]
+                args=[host_queue, response_queue, timeout, ssh_args])
         t.start()
 
     host_queue.join()
