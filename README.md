@@ -1,7 +1,8 @@
 ssh-auth-methods
 ================
 
-A simple, single-function Python 3 script that returns a list of the authentication methods supported by an SSH server.
+A simple Python 3 script and package that returns a list of the
+authentication methods supported by an SSH server.
 
 ## Use
 
@@ -34,12 +35,13 @@ received.
 
 The auth method 'none' implies that the SSH server let us in without any
 authentication at all. I suspect this is possible, although I haven't encountered
-it. In this case, we can't find what the other potential auth methods
+it. The SSH command ends in `'exit'` so that we'll disconnect immediately
+if granted access. In this case, we can't find what the other potential auth methods
 are (nor do they really matter), so 'none' will be the only one returned.
 Additionally, we assume that any non-error (i.e. not `255`) SSH exit status
 means the login was successful. This is because 255 is OpenSSH's only
 error status, and all other statuses are those of the remotely executed
-command.
+command (see OpenSSH man pages).
 
 ### Function
 

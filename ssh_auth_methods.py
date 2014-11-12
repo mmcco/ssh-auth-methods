@@ -1,6 +1,7 @@
 import subprocess, sys, threading
 from queue import Queue
 from math import ceil
+from time import sleep
 
 def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
     try:
@@ -104,6 +105,7 @@ def _threaded_auth_methods(host_file, delay=0.1, timeout=5.0, verbose=False):
                 target=_ssh_worker,
                 args=[host_queue, response_queue, ssh_args])
         t.start()
+        sleep(delay)
 
     host_queue.join()
 
