@@ -138,7 +138,7 @@ def main():
 
         master_thread = threading.Thread(
                 target=threaded_auth_methods,
-                args={'response_queue': response_queue, 'verbose': verbose})
+                kwargs={'response_queue': response_queue, 'verbose': verbose})
         master_thread.daemon = True
         master_thread.start()
 
