@@ -39,7 +39,7 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
         # left immediately.
         if verbose:
             print('Eek! %s allowed unauthenticated login! Exiting.'
-                    % hostname)
+                    % hostname, file=sys.stderr)
         return ['none']
     # This is in fact the expected case, as we expect the SSH server to
     # reject the unauthenticated connection, and therefore expect exit code
@@ -52,7 +52,7 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
             if verbose:
                 print('Eek! %s allowed unauthenticated login! '
                 'Also, the command passed had a non-zero exit status.'
-                        % hostname)
+                        % hostname, file=sys.stderr)
             return ['none']
 
         elif result.startswith('Permission denied (') \
@@ -148,9 +148,9 @@ def main():
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
-                file=sys.stdin)
+                file=sys.stderr)
         print('usage: python3 ssh_password.py [-v]',
-                file=sys.stdin)
+                file=sys.stderr)
         sys.exit(1)
 
 
