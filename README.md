@@ -46,7 +46,7 @@ be printed to standard error. For example, if you want the results
 stored in `stdout_results.txt` and the error descriptions stored in
 `stderr_results.txt`, you can use:
 
-`cat my_addrs.txt | python3 ssh_auth_methods.py --verbose > stdout_results.txt >&2 stderr_results.txt`
+`(cat my_addrs.txt | python3 ssh_auth_methods.py --verbose > stdout_results.txt) 2> stderr_results.txt`
 
 The script is threaded, so outputs will be printing as they are received
 and processed.
