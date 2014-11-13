@@ -149,7 +149,7 @@ def main():
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
                 file=sys.stderr)
-        print('usage: python3 ssh_password.py [-v]',
+        print('usage: python3 ssh_password.py [--verbose]',
                 file=sys.stderr)
         sys.exit(1)
 
