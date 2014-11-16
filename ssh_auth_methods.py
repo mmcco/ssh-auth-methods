@@ -82,6 +82,17 @@ def _ssh_worker(host_queue, response_queue, ssh_args):
     host_queue.task_done()
 
 
+def unthreaded_auth_methods(host_file=sys.stdin, response_file=sys.stdout, timeout=5.0, verbose=False):
+    for line in host_file:
+        hostname = line.strip()
+        methods = get_auth_methods(hostname, timeout=timeout, verbose=verbose)
+        if methods is None:
+            print(hostname, file=response_file)
+        else:
+            print('\t'.join([hostname] + methods),
+                    file=response_file)
+
+
 def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.1, timeout=5.0, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
