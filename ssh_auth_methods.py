@@ -67,19 +67,21 @@ def get_auth_methods(hostname, port=22, timeout=5.0, verbose=False):
     # we leave subprocess.TimeoutExpired uncaught, so it will propagate
 
 
-def _ssh_worker(host_queue, response_queue, ssh_args):
-    hostname = host_queue.get()
+def _ssh_worker(host_queue, response_queue, ssh_args, thread_semaphore):
+        hostname = host_queue.get()
 
-    try:
-        resp = get_auth_methods(hostname, **ssh_args)
-    except:
-        resp = None
-        # print exception text to stderr if we're being verbose
-        if ssh_args['verbose']:
-            print(sys.exc_info()[1], file=sys.stderr)
+        try:
+            resp = get_auth_methods(hostname, **ssh_args)
+        except:
+            resp = None
+            # print exception text to stderr if we're being verbose
+            if ssh_args['verbose']:
+                print(sys.exc_info()[1], file=sys.stderr)
 
-    response_queue.put((hostname, resp))
-    host_queue.task_done()
+        response_queue.put((hostname, resp))
+        host_queue.task_done()
+        # signal thread death
+        thread_semaphore.release()
 
 
 def unthreaded_auth_methods(host_file=sys.stdin, response_file=sys.stdout, delay=0.0, timeout=5.0, verbose=False):
@@ -96,24 +98,23 @@ def unthreaded_auth_methods(host_file=sys.stdin, response_file=sys.stdout, delay
         sleep(delay)
 
 
-def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.5, timeout=5.0, verbose=False):
+def threaded_auth_methods(response_queue, host_file=sys.stdin, max_threads=5, timeout=5.0, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
     # TODO: add port
     ssh_args = {'verbose': verbose, 'timeout': timeout}
     host_queue = Queue()
-
-    num_hosts = 0
+    thread_semaphore = threading.BoundedSemaphore(max_threads)
 
     for line in host_file:
-        num_hosts += 1
+        # wait until there are less than max_thread threads
+        thread_semaphore.acquire()
         host_queue.put(line.strip())
         t = threading.Thread(
                 target=_ssh_worker,
-                args=[host_queue, response_queue, ssh_args])
+                args=[host_queue, response_queue, ssh_args, thread_semaphore])
         t.start()
-        sleep(delay)
 
     host_queue.join()
 
@@ -142,9 +143,6 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
-        # use unthreaded for dev
-        unthreaded_auth_methods()
-        '''
         response_queue = Queue()
 
         master_thread = threading.Thread(
@@ -161,7 +159,6 @@ def main():
 
         master_thread.join()
         response_queue.join()
-        '''
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
