@@ -90,7 +90,7 @@ def unthreaded_auth_methods(host_file=sys.stdin, response_file=sys.stdout, delay
             print('\t'.join([hostname] + methods), file=response_file)
         except:
             print(hostname, file=response_file)
-            if ssh_args['verbose']:
+            if verbose:
                 print(sys.exc_info()[1], file=sys.stderr)
 
         sleep(delay)
@@ -142,6 +142,9 @@ def main():
             len(sys.argv) == 2 and sys.argv[1] == '--verbose':
         verbose = len(sys.argv) == 2
 
+        # use unthreaded for dev
+        unthreaded_auth_methods()
+        '''
         response_queue = Queue()
 
         master_thread = threading.Thread(
@@ -158,6 +161,7 @@ def main():
 
         master_thread.join()
         response_queue.join()
+        '''
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
