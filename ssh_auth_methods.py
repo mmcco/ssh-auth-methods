@@ -82,18 +82,21 @@ def _ssh_worker(host_queue, response_queue, ssh_args):
     host_queue.task_done()
 
 
-def unthreaded_auth_methods(host_file=sys.stdin, response_file=sys.stdout, timeout=5.0, verbose=False):
+def unthreaded_auth_methods(host_file=sys.stdin, response_file=sys.stdout, delay=0.0, timeout=5.0, verbose=False):
     for line in host_file:
         hostname = line.strip()
-        methods = get_auth_methods(hostname, timeout=timeout, verbose=verbose)
-        if methods is None:
+        try:
+            methods = get_auth_methods(hostname, timeout=timeout, verbose=verbose)
+            print('\t'.join([hostname] + methods), file=response_file)
+        except:
             print(hostname, file=response_file)
-        else:
-            print('\t'.join([hostname] + methods),
-                    file=response_file)
+            if ssh_args['verbose']:
+                print(sys.exc_info()[1], file=sys.stderr)
+
+        sleep(delay)
 
 
-def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.1, timeout=5.0, verbose=False):
+def threaded_auth_methods(response_queue, host_file=sys.stdin, delay=0.5, timeout=5.0, verbose=False):
     # All get_auth_methods() args aside from hostname are optional,
     # and are the same across all calls.
     # We therefore use a dict of args that is unpacked in calls.
@@ -155,7 +158,6 @@ def main():
 
         master_thread.join()
         response_queue.join()
-
 
     else:
         print('ERROR: input must be line-delimited hostnames from stdin',
