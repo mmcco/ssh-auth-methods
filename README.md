@@ -27,7 +27,7 @@ The input can be domain names or IP addresses.
 Multiple inputs are expected to be line-delimited. To test each
 in a file of line-delimited addresses, simply use:
 
-`cat my_addrs.txt | python3 ssh_auth_methods.py`
+`python3 ssh_auth_methods.py < my_addrs.txt`
 
 ### Output
 
@@ -40,13 +40,13 @@ Nothing is printed after the address if the address
 could not be resolved, the request timed out,
 or that there was an error parsing the response received.
 
-If the ``--verbose`` option is supplied on the command line (the only
+If the `--verbose` option is supplied on the command line (the only
 command line option currently supported) these causes of failure will
 be printed to standard error. For example, if you want the results
 stored in `stdout_results.txt` and the error descriptions stored in
 `stderr_results.txt`, you can use:
 
-`(cat my_addrs.txt | python3 ssh_auth_methods.py --verbose > stdout_results.txt) 2> stderr_results.txt`
+`python3 ssh_auth_methods.py --verbose < my_addrs.txt > stdout_results.txt 2> stderr_results.txt`
 
 The script is threaded, so outputs will be printing as they are received
 and processed.
