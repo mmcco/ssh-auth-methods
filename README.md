@@ -80,7 +80,7 @@ SSH protection software like [SSHGuard](http://www.sshguard.net/) and
 probably find your requests suspect even though they don't attempt to
 feign authentication. I know SSHGuard does, as some of my own servers
 started blocking my test server. This may even lead to the IP address
-used being added to a blacklist if this software reports offenders. So,
+used being added to a blacklist if this software reports offenders. So
 exercise restraint, and consider using a [dirt-cheap VPS](http://lowendbox.com/).
 
 As with all security scanning software, there is potential to make
@@ -143,6 +143,9 @@ than the supplied timeout.
 
 I think the `subprocess.check_output()` timeout is probably preferable;
 if we haven't heard back from the server in five or so seconds, we
-probably aren't getting a response. However, there is no easy way
-to implement this in earlier versions of Python, aside perhaps from
+probably aren't getting a response. Moreover, the `ConnectTimeout` SSH
+option allows that timeout for *every* address returned by the DNS
+resolution. `ssh PreferredAuthentication=none ConnectTimeout=5 google.com`
+can take more than a minute to fail. However, there is no easy way
+to implement simple subprocess timeout in Python <3.3, aside perhaps from
 making the user install the `subprocess32` package.
