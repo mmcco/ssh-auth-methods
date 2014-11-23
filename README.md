@@ -138,14 +138,11 @@ with older versions. The optional `timeout` argument was added to
 `subprocess.check_output()` in Python 3.3. With older versions of
 Python, we instead use the `ConnectTimeout` SSH option. This allows
 the specified timeout for every IP address associated with a domain
-name, so something like `google.com` will take significantly longer
-than the supplied timeout.
+name, so probing a major domain like `google.com` will take significantly longer
+than the supplied timeout to fail.
 
 I think the `subprocess.check_output()` timeout is probably preferable;
 if we haven't heard back from the server in five or so seconds, we
-probably aren't getting a response. Moreover, the `ConnectTimeout` SSH
-option allows that timeout for *every* address returned by the DNS
-resolution. `ssh PreferredAuthentication=none ConnectTimeout=5 google.com`
-can take more than a minute to fail. However, there is no easy way
+probably aren't getting a response. However, there is no easy way
 to implement simple subprocess timeout in Python <3.3, aside perhaps from
 making the user install the `subprocess32` package.
