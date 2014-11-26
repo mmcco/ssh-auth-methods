@@ -73,7 +73,7 @@ hostnames and spawns a thread executing `get_auth_methods()` for each
 of them. I'll leave out specific argument descriptions, as the code
 should be self-documenting.
 
-## Warning
+## Warnings
 
 SSH protection software like [SSHGuard](http://www.sshguard.net/) and
 [fail2ban](http://www.fail2ban.org/wiki/index.php/Main_Page) will
