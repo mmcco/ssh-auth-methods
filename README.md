@@ -84,10 +84,8 @@ used being added to a blacklist if this software reports offenders. So
 exercise restraint, and consider using a [dirt-cheap VPS](http://lowendbox.com/).
 
 As with all security scanning software, there is potential to make
-people suspicious or angry if you don't give them prior warning. Despite
-this being a particularly harmless breed, I should probably clarify that
-I don't offer this script for nefarious or illegal use. For everything
-you need to know about liability, see the included license.
+people suspicious or angry if you don't give them prior warning. For
+everything you need to know about liability, see the included license.
 
 ## Dependencies
 
