@@ -1,7 +1,7 @@
 ssh-auth-methods
 ================
 
-A simple Python 3 script and package that returns a list of the
+A Python 3 script that returns a list of the
 authentication methods supported by an SSH server.
 
 No non-standard Python packages are required.
