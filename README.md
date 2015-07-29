@@ -1,8 +1,8 @@
 ssh-auth-methods
 ================
 
-A Python 3 script that returns a list of the
-authentication methods supported by an SSH server.
+A Python 3 script that returns a list of the authentication methods supported
+by an SSH server.
 
 No non-standard Python packages are required.
 
@@ -77,8 +77,8 @@ should be self-documenting.
 
 SSH protection software like [SSHGuard](http://www.sshguard.net/) and
 [fail2ban](http://www.fail2ban.org/wiki/index.php/Main_Page) will
-probably find your requests suspect even though they don't attempt to
-feign authentication. I know SSHGuard does, as some of my own servers
+probably find your connections suspect even though they don't attempt
+authentication. I know SSHGuard does, as some of my own servers
 started blocking my test server. This may even lead to the IP address
 used being added to a blacklist if this software reports offenders. So
 exercise restraint, and consider using a [dirt-cheap VPS](http://lowendbox.com/).
